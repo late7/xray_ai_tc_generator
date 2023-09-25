@@ -4,6 +4,9 @@ This Python script generates test cases for a given requirement specification us
 
 ## Arguments
 
+Example run command:
+python .\generate-tcs-for-issue.py --req TST-47 --username lasse@gmail.com --url https://test.atlassian.net
+
 The script takes in the following arguments:
 
 - `--req`: The ID of the Jira issue containing the requirement specification.
