@@ -35,5 +35,5 @@ eyJhbGciO1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiIz...........
 ### OpenAI API token just one line:
 sk-0NpOoHLtMASW5ECT3Blb..............
 
-### XRAY Suth json also just one line
+### XRAY Auth json also just one line
 { "client_id": "FF328C5A1A487E9A...........","client_secret": "bbf3997c59bb1d63e76658fd266414c73............" }
