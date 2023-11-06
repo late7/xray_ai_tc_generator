@@ -5,13 +5,14 @@ This Python script generates test cases for a given requirement specification us
 ## Arguments
 
 Example run command:
-> python .\generate-tcs-for-issue.py --req TST-47 --username lasse@gmail.com --url https://test.atlassian.net
+> python generate-tcs-for-issue.py --req TST-47 --username lasse@gmail.com --url https://test.atlassian.net
 
 The script takes in the following arguments:
 
 - `--req`: The ID of the Jira issue containing the requirement specification.
 - `--username`: The username used to log in to Jira.
 - `--url`: The URL of the Jira Cloud instance.
+- `--tc_amount`: Amount of Test Cases to generate. Default is 1.
 - `--debug`: A boolean flag indicating whether to print debug information.
 
 ## Workflow
@@ -30,10 +31,13 @@ The script takes in the following arguments:
 ## Example token and auth files
 
 ### Jira API token just one line:
+Copy and update jira_token.txt from template
 eyJhbGciO1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiIz...........
 
 ### OpenAI API token just one line:
+Copy and update openai.txt from template
 sk-0NpOoHLtMASW5ECT3Blb..............
 
 ### XRAY Auth json also just one line
+Copy and update xray_auth.json from template
 { "client_id": "FF328C5A1A487E9A...........","client_secret": "bbf3997c59bb1d63e76658fd266414c73............" }
