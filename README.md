@@ -32,12 +32,15 @@ The script takes in the following arguments:
 
 ### Jira API token just one line:
 Copy and update jira_token.txt from template
+
 eyJhbGciO1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiIz...........
 
 ### OpenAI API token just one line:
 Copy and update openai.txt from template
+
 sk-0NpOoHLtMASW5ECT3Blb..............
 
 ### XRAY Auth json also just one line
 Copy and update xray_auth.json from template
+
 { "client_id": "FF328C5A1A487E9A...........","client_secret": "bbf3997c59bb1d63e76658fd266414c73............" }
