@@ -22,6 +22,8 @@ The script takes in the following arguments:
 3. Saves the output to a JSON file.
 4. Imports the generated test cases into XRAY using the XRAY API.
 
+   See demo video https://youtu.be/x2-DIJQZe3U
+
 ## Libraries Used
 
 - `requests`: To make HTTP requests to Jira and XRAY.
