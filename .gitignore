@@ -1,3 +1,12 @@
+# API keys
+jira_token.txt
+openai_token.txt
+xray_auth.json
+
+# Temporary files
+output_tc.json
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

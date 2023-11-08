@@ -5,7 +5,7 @@ import openai
 import argparse
 # from generate_json import generate_with_openai
 
-OPENAI_TOKEN_FILE = 'openai.txt'  # https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key
+OPENAI_TOKEN_FILE = 'openai_token.txt'  # https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key
 AI_MODEL        = "gpt-4" # "gpt-3.5-turbo"
 
 # Jira Cloud configuration
@@ -56,8 +56,6 @@ def generate_with_openai(prompt, tc_amount, debug):
       messages=[
           {
           "role": "system",
-  
-          # "content": "Define 2 Test Cases for the provided requirement specification. it. Note: Response must be in plain json format.\n\nJson format to use:\n\n[\n    {\n        \"testtype\": \"Manual\",\n        \"fields\": {\n            \"summary\": \"Test Case 1: Minimum Speed Test\",\n            \"description\": \"Objective: To verify that...\\n Preconditions: ...\"\n        },\n        \"steps\": [\n            {\n                \"action\": \"Begin a data fetch to ...\",\n                \"data\": \"\",\n                \"result\": \"Data fetch operation must be completed...\"\n            },\n        ]\n    }\n]"
           "content": system_prompt
           },
           {
@@ -77,7 +75,7 @@ def generate_with_openai(prompt, tc_amount, debug):
     with open('output_tc.json', 'w') as file:
         json.dump(response['choices'][0]['message']['content'], file)
     
-    return "Generation Done."
+    return "Generation Done. Tokens used: " + str(response['usage']['total_tokens'])
 
 def import_test_cases_to_xray(JIRA_PARENT_ISSUE, debug):
 
