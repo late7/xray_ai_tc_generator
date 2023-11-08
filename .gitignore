@@ -5,6 +5,7 @@ xray_auth.json
 
 # Temporary files
 output_tc.json
+temp/
 
 
 # Byte-compiled / optimized / DLL files

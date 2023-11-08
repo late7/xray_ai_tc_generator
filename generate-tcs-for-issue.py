@@ -3,6 +3,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import openai
 import argparse
+from test_case_parser import filter_test_cases
 # from generate_json import generate_with_openai
 
 OPENAI_TOKEN_FILE = 'openai_token.txt'  # https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key
@@ -70,12 +71,18 @@ def generate_with_openai(prompt, tc_amount, debug):
       presence_penalty=0
       )
     json_result = response['choices'][0]['message']['content']
-    if debug: print(json_result)
+    if debug: 
+        print(json_result)
+        print("Generation Done. Tokens used: " + str(response['usage']['total_tokens']))
+
+    # Ask user which test cases to keep and filter
+    filtered_json_output = filter_test_cases(json_result)
 
     with open('output_tc.json', 'w') as file:
-        json.dump(response['choices'][0]['message']['content'], file)
+        # json.dump(response['choices'][0]['message']['content'], file)
+        json.dump(filtered_json_output, file)
     
-    return "Generation Done. Tokens used: " + str(response['usage']['total_tokens'])
+    return
 
 def import_test_cases_to_xray(JIRA_PARENT_ISSUE, debug):
 
@@ -143,9 +150,9 @@ def main(req, username, baseurl, tc_amount, debug):
     else:
         print("No love. Issue not found for id: " + req)
         exit()
-    if input("Generate Test Cases: y/n?") == "y":
+    if input("Generate Test Cases: [y]/n?") != "n":
         generate_testcases(req_data, tc_amount, debug)
-        if input("Import Test Cases to XRAY: y/n?") == "y":
+        if input("Import Test Cases to XRAY: [y]/n?") != "n":
             import_test_cases_to_xray(req, debug)
     else:
         print(issue_data['fields']['issuelinks'])
