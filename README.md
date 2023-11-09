@@ -29,7 +29,9 @@ The script takes in the following arguments:
 - `requests`: To make HTTP requests to Jira and XRAY.
 - `openai`: To interact with OpenAI's GPT-4 API.
 - `argparse`: To parse command-line arguments. (build-in Python)
-- - `argparse`: To parse json content. (build-in Python)
+- `json`: To parse json content. (build-in Python)
+
+Install needed libraries by running: pip install -r requirements.txt
 
 ## Example token and auth files
 
