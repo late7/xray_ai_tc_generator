@@ -52,7 +52,7 @@ def generate_with_openai(prompt, tc_amount, debug):
     # Create Prompt
     # tc_amount = 2
     system_prompt = "Define " + str(tc_amount) + " Test Cases for the provided requirement specification. it. Note: Response must be in plain json format.\n\nJson format to use:\n\n[\n    {\n        \"testtype\": \"Manual\",\n        \"fields\": {\n            \"summary\": \"Test Case 1: Minimum Speed Test\",\n            \"description\": \"Objective: To verify that...\\n Preconditions: ...\"\n        },\n        \"steps\": [\n            {\n                \"action\": \"Begin a data fetch to ...\",\n                \"data\": \"\",\n                \"result\": \"Data fetch operation must be completed...\"\n            },\n        ]\n    }\n]"
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
       model= AI_MODEL,
       messages=[
           {
@@ -70,7 +70,8 @@ def generate_with_openai(prompt, tc_amount, debug):
       frequency_penalty=0,
       presence_penalty=0
       )
-    json_result = response['choices'][0]['message']['content']
+    # json_result = response['choices'][0]['message']['content']
+    json_result = response.choices[0].message.content
     if debug: 
         print(json_result)
         print("Generation Done. Tokens used: " + str(response['usage']['total_tokens']))
