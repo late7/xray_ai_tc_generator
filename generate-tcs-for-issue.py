@@ -39,13 +39,13 @@ def get_issue_data(issue_key, BASE_URL, USERNAME):
         print(response.text)
         return None
 
-def generate_testcases(req_data, tc_amount, debug):
-    print("Let's generate Test Cases: ")
-    if debug: print(req_data)
-    ai_data = generate_with_openai(req_data, tc_amount, debug)
-    if debug: print(ai_data)
+# def generate_testcases(req_data, tc_amount, debug):
+#     print("Let's generate Test Cases: ")
+#     if debug: print(req_data)
+#     ai_data = generate_with_openai(req_data, tc_amount, debug)
+#     if debug: print(ai_data)
  
-def generate_with_openai(prompt, tc_amount, debug):
+def generate_with_openai(prompt, tc_amount, skip_checks, debug):
     with open(OPENAI_TOKEN_FILE, 'r') as file:
         openai.api_key = file.readline().strip()
 
@@ -77,7 +77,10 @@ def generate_with_openai(prompt, tc_amount, debug):
         print("Generation Done. Tokens used: " + str(response['usage']['total_tokens']))
 
     # Ask user which test cases to keep and filter
-    filtered_json_output = filter_test_cases(json_result)
+    if skip_checks == False:
+        filtered_json_output = filter_test_cases(json_result)
+    else:
+        filtered_json_output = json_result
 
     with open('output_tc.json', 'w') as file:
         # json.dump(response['choices'][0]['message']['content'], file)
@@ -134,7 +137,7 @@ def import_test_cases_to_xray(JIRA_PARENT_ISSUE, debug):
         print(data)
 
         
-def main(req, username, baseurl, tc_amount, debug):
+def main(req, username, baseurl, tc_amount, skip_checks, debug):
     url = baseurl + '/rest/api/2'
     # ISSUE_KEY = input("Enter the IssueID for Requirement : ")
     issue_data = get_issue_data(req, url, username)
@@ -147,16 +150,21 @@ def main(req, username, baseurl, tc_amount, debug):
             desc = " "
             print("No Description using summary only!")     
         req_data = summ + "\n" + desc
-        print("Req data found:" + req + "\n" + req_data)        
+        print("Req data found:" + req + "\n" + req_data, flush=True)        
     else:
         print("No love. Issue not found for id: " + req)
         exit()
-    if input("Generate Test Cases: [y]/n?") != "n":
-        generate_testcases(req_data, tc_amount, debug)
-        if input("Import Test Cases to XRAY: [y]/n?") != "n":
-            import_test_cases_to_xray(req, debug)
+    if skip_checks:
+        print("Skipping checks.")
+        generate_with_openai(req_data, tc_amount, skip_checks, debug)
+        import_test_cases_to_xray(req, debug)
     else:
-        print(issue_data['fields']['issuelinks'])
+        if input("Generate Test Cases: [y]/n?") != "n":
+            generate_with_openai(req_data, tc_amount, skip_checks, debug)
+            if input("Import Test Cases to XRAY: [y]/n?") != "n":
+                import_test_cases_to_xray(req, debug)
+        else:
+            print(issue_data['fields']['issuelinks'])
 
 
 if __name__ == "__main__":
@@ -166,9 +174,10 @@ if __name__ == "__main__":
     parser.add_argument('--url', required=True, help='Jira Cloud URL.')
     parser.add_argument('--tc_amount', type=int, default=1, help='Amount of Test Cases to generate. Default is 1.')
     parser.add_argument('--debug', type=bool, default=False, help='Debug flag. Default is False.')
+    parser.add_argument('--skip_checks', type=bool, default=False, help='Skip confirmation questions. Default is False.')
 
     args = parser.parse_args()
 
-    main(args.req, args.username, args.url, args.tc_amount, args.debug)
+    main(args.req, args.username, args.url, args.tc_amount, args.skip_checks, args.debug)
 
 
