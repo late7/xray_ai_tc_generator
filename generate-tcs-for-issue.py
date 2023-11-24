@@ -38,19 +38,35 @@ def get_issue_data(issue_key, BASE_URL, USERNAME):
         print(f"Failed to fetch issue data. Status code: {response.status_code}")
         print(response.text)
         return None
+    
+# Define Test Case Issue
+def delete_test_case(issue_key, BASE_URL, USERNAME):
+    with open(JIRA_TOKEN_FILE, 'r') as file:
+        JIRA_TOKEN = file.readline().strip()
+    url = f"{BASE_URL}/issue/{issue_key}"
 
-# def generate_testcases(req_data, tc_amount, debug):
-#     print("Let's generate Test Cases: ")
-#     if debug: print(req_data)
-#     ai_data = generate_with_openai(req_data, tc_amount, debug)
-#     if debug: print(ai_data)
+    headers = {
+        'Accept': 'application/json',
+    }
+    
+    response = requests.delete(
+        url,
+        headers=headers,
+        auth=HTTPBasicAuth(USERNAME, JIRA_TOKEN)
+    )
+    
+    if response.status_code == 204:
+        print("Test Case deleted successfully!")
+    else:
+        print(f"Failed to delete Test Case. Status code: {response.status_code}")
+        print(response.text)
+        return None
  
 def generate_with_openai(prompt, tc_amount, skip_checks, debug):
     with open(OPENAI_TOKEN_FILE, 'r') as file:
         openai.api_key = file.readline().strip()
 
-    # Create Prompt
-    # tc_amount = 2
+    # Create Prompt for OpenAI
     system_prompt = "Define " + str(tc_amount) + " Test Cases for the provided requirement specification. it. Note: Response must be in plain json format.\n\nJson format to use:\n\n[\n    {\n        \"testtype\": \"Manual\",\n        \"fields\": {\n            \"summary\": \"Test Case 1: Minimum Speed Test\",\n            \"description\": \"Objective: To verify that...\\n Preconditions: ...\"\n        },\n        \"steps\": [\n            {\n                \"action\": \"Begin a data fetch to ...\",\n                \"data\": \"\",\n                \"result\": \"Data fetch operation must be completed...\"\n            },\n        ]\n    }\n]"
     response = openai.chat.completions.create(
       model= AI_MODEL,
@@ -70,7 +86,7 @@ def generate_with_openai(prompt, tc_amount, skip_checks, debug):
       frequency_penalty=0,
       presence_penalty=0
       )
-    # json_result = response['choices'][0]['message']['content']
+    # json_result = response['choices'][0]['message']['content'] # This is for v1 of the openai package: pypi.org/project/openai
     json_result = response.choices[0].message.content
     if debug: 
         print(json_result)
@@ -137,7 +153,7 @@ def import_test_cases_to_xray(JIRA_PARENT_ISSUE, debug):
         print(data)
 
         
-def main(req, username, baseurl, tc_amount, skip_checks, debug):
+def main(req, username, baseurl, tc_amount, skip_checks, del_tc, debug):
     url = baseurl + '/rest/api/2'
     issue_data = get_issue_data(req, url, username)
     
@@ -160,6 +176,16 @@ def main(req, username, baseurl, tc_amount, skip_checks, debug):
     else:
         print("No love. Issue not found for id: " + req)
         exit()
+
+    # Check does issue have linked Test Cases
+    if del_tc and issue_data['fields']['issuelinks']:
+        # Loop through all linked issues
+        for issue in issue_data['fields']['issuelinks']:
+            # Check if linked issue is of type 'Test'
+            if issue['type']['name'] == "Test":
+                delete_test_case(issue['inwardIssue']['key'], url, username)
+                print("Deleted linked Test Case: " + issue['inwardIssue']['key'], flush=True)
+  
     if skip_checks:
         print("Skipping checks.")
         generate_with_openai(req_data, tc_amount, skip_checks, debug)
@@ -171,6 +197,7 @@ def main(req, username, baseurl, tc_amount, skip_checks, debug):
                 import_test_cases_to_xray(req, debug)
         else:
             print("No Test Cases generated. Exiting.")
+            exit()
 
 
 if __name__ == "__main__":
@@ -181,9 +208,10 @@ if __name__ == "__main__":
     parser.add_argument('--tc_amount', type=int, default=1, help='Amount of Test Cases to generate. Default is 1.')
     parser.add_argument('--debug', type=bool, default=False, help='Debug flag. Default is False.')
     parser.add_argument('--skip_checks', type=bool, default=False, help='Skip confirmation questions. Default is False.')
+    parser.add_argument('--del_tc', type=bool, default=False, help='Delete existing linked Test Cases. Default is False.')
 
     args = parser.parse_args()
 
-    main(args.req, args.username, args.url, args.tc_amount, args.skip_checks, args.debug)
+    main(args.req, args.username, args.url, args.tc_amount, args.skip_checks, args.del_tc, args.debug)
 
 
