@@ -139,11 +139,17 @@ def import_test_cases_to_xray(JIRA_PARENT_ISSUE, debug):
         
 def main(req, username, baseurl, tc_amount, skip_checks, debug):
     url = baseurl + '/rest/api/2'
-    # ISSUE_KEY = input("Enter the IssueID for Requirement : ")
     issue_data = get_issue_data(req, url, username)
     
     if issue_data:
         summ = "Requirement summary: " + issue_data['fields']['summary']
+        # Check if issue type is requirement i.e. not type of 'Test', 'Test Set' or 'Test Plan'
+        issueType = str(issue_data['fields']['issuetype']['name'])
+        print("Issue type: " + issueType)
+        if issueType == "Test" or issueType == "Test Set" or issueType == "Test Plan":
+            print("Issue type is not a requirement. You cannot create linked Test Case for a Test item. Exiting.")
+            exit()
+        # Check if issue has description    
         if issue_data['fields']['description']:
             desc = "Requirement description: " + issue_data['fields']['description']
         else: 
@@ -164,7 +170,7 @@ def main(req, username, baseurl, tc_amount, skip_checks, debug):
             if input("Import Test Cases to XRAY: [y]/n?") != "n":
                 import_test_cases_to_xray(req, debug)
         else:
-            print(issue_data['fields']['issuelinks'])
+            print("No Test Cases generated. Exiting.")
 
 
 if __name__ == "__main__":
