@@ -22,7 +22,8 @@ The script takes in the following arguments:
 3. Saves the output to a JSON file.
 4. Imports the generated test cases into XRAY using the XRAY API.
 
-   See demo video https://youtu.be/x2-DIJQZe3U
+   See demo video https://www.youtube.com/watch?v=WT9yVStSW48
+   or in Finnish https://youtu.be/twBfkGKdKg8
 
 ## Libraries Used
 
